@@ -1,88 +1,87 @@
+<!-- Clan War Time Advisor - Edmontonation -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Clan War Time Advisor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edmontonation Clan War Time Advisor</title>
 <style>
-  body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #1e1e2f, #121212); color: #f0f0f0; text-align: center; padding: 2rem; }
-  h1 { color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.7); font-size: 2.5rem; }
-  p { max-width: 600px; margin: auto; font-size: 1.1rem; color: #ccc; }
-  label { font-weight: bold; }
-  input { padding: 0.5rem; border: none; border-radius: 5px; }
-  button { background: #ffd700; border: none; border-radius: 5px; padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; transition: background 0.3s; }
-  button:hover { background: #ffcc33; }
-  .result { margin-top: 2rem; font-size: 1.3rem; }
-  .best { color: #00ff88; font-weight: bold; text-shadow: 0 0 5px rgba(0,255,136,0.6); }
-  .avoid { color: #ff5555; font-weight: bold; text-shadow: 0 0 5px rgba(255,85,85,0.6); }
-  .clanbar { margin: 0.3rem auto 1rem; font-size: 1.1rem; }
-  .clanbar .name { font-weight: 800; color:#7dd3fc; }
-  .clanbar .elder { display:inline-block; margin-left:10px; padding:4px 10px; border-radius:999px; background:#0b1220; border:1px solid #ffffff22; color:#e2e8f0; }
-  .ticker-wrap{ position:fixed; left:0; right:0; bottom:0; background:linear-gradient(90deg,#0b1020,#1a1030); border-top:1px solid #ffffff22; padding:6px 0; box-shadow:0 -8px 24px rgba(0,0,0,.35); }
-  .ticker{ overflow:hidden; white-space:nowrap; }
-  .ticker-line{ display:inline-block; padding-left:100%; animation: ticker 18s linear infinite; font-weight:700; letter-spacing:.3px; }
-  .tag{ display:inline-block; margin:0 10px; padding:.2rem .5rem; border-radius:999px; background:#ffd700; color:#1b1b2b; }
-  @keyframes ticker{ 0%{ transform: translateX(0);} 100%{ transform: translateX(-100%);} }
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #111, #333);
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+  header {
+    background: linear-gradient(90deg, crimson, gold);
+    padding: 20px;
+    font-size: 2em;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px #000;
+  }
+  .tracker {
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 500px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(255,255,255,0.3);
+  }
+  .elder-bar {
+    margin-top: 15px;
+    font-size: 1.2em;
+    color: gold;
+  }
+  footer {
+    margin-top: 30px;
+    padding: 10px;
+    font-size: 0.8em;
+    background: #222;
+  }
+  .ticker {
+    margin-top: 20px;
+    overflow: hidden;
+    white-space: nowrap;
+    box-sizing: border-box;
+    animation: ticker 20s linear infinite;
+    font-style: italic;
+    color: #ccc;
+  }
+  @keyframes ticker {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
 </style>
 </head>
 <body>
-<h1>Clan War Time Advisor</h1>
-<p>Welcome to <strong id="clanName"></strong>! Type your city or time zone to see the best times to attack and when to avoid, based on Europe & Middle East peak hours.</p>
-<div id="clanBar" class="clanbar"></div>
-<label for="tz">City/Timezone:</label>
-<input id="tz" type="text" placeholder="e.g. America/Edmonton">
-<button onclick="advise()">Get Times</button>
-<div class="result" id="output"></div>
-<div class="ticker-wrap"><div class="ticker"><span class="ticker-line" id="tickerLine"></span></div></div>
-<script>
-const CLAN_NAME = "Edmontonation";
-const ELDER_BAR_MEDALS = 2500;
-const ADULT_BANTER = [
-  "By doing your war attacks you build confidence — and confidence attracts hot girls.",
-  "Doing your war attacks helps build wealth and can increase your sex drive.",
-  "Skip excuses, do war attacks — future you says thanks (and so will your DMs).",
-  "Real Elders finish their war attacks before breakfast.",
-  "War medals today, bragging rights tonight."
-];
-
-document.getElementById('clanName').textContent = CLAN_NAME;
-document.getElementById('clanBar').innerHTML = `<span class="name">Clan: ${CLAN_NAME}</span> · <span class="elder">Elder Bar: ${ELDER_BAR_MEDALS} medals (this week)</span>`;
-
-(function startTicker(){
-  const line = document.getElementById('tickerLine');
-  function build(){
-    const picks = [...ADULT_BANTER].sort(()=>Math.random()-0.5).slice(0,3);
-    line.innerHTML = `<span class="tag">NEWS</span> ` + picks.join("  •  ") + "  •  ";
-  }
-  build();
-  setInterval(build, 36000);
-})();
-
-function advise(){
-  const tz = document.getElementById('tz').value || Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const peakStartUTC = 16;
-  const peakEndUTC = 21;
-  function utcToLocal(utcHour){
-    const now = new Date();
-    now.setUTCHours(utcHour, 0, 0, 0);
-    return new Date(now.toLocaleString('en-US', { timeZone: tz }));
-  }
-  const localPeakStart = utcToLocal(peakStartUTC);
-  const localPeakEnd = utcToLocal(peakEndUTC);
-  let eveningBestStart = new Date(localPeakEnd);
-  eveningBestStart.setHours(localPeakEnd.getHours() + 1);
-  let eveningBestEnd = new Date(eveningBestStart);
-  eveningBestEnd.setHours(eveningBestStart.getHours() + 2);
-  let morningBestStart = new Date(localPeakStart);
-  morningBestStart.setHours(localPeakStart.getHours() - 4);
-  let morningBestEnd = new Date(morningBestStart);
-  morningBestEnd.setHours(morningBestStart.getHours() + 2);
-  function fmt(t){ return t.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}); }
-  document.getElementById('output').innerHTML = `
-    <div class='best'>🌙 Evening Best: ${fmt(eveningBestStart)} – ${fmt(eveningBestEnd)}</div>
-    <div class='best'>☀️ Morning Best: ${fmt(morningBestStart)} – ${fmt(morningBestEnd)}</div>
-    <div class='avoid'>🚫 Avoid: ${fmt(localPeakStart)} – ${fmt(localPeakEnd)}</div>
-  `;
-}
-</script>
+  <header>Edmontonation</header>
+  <div class="tracker">
+    <h2>Clan War Time Advisor</h2>
+    <p>Best Evening Time: <strong>10:00 PM – 12:00 AM</strong></p>
+    <p>Best Morning Time: <strong>6:00 AM – 8:00 AM</strong></p>
+    <p>Avoid Time: <strong>6:00 PM – 9:00 PM</strong></p>
+    <div class="elder-bar">Elder Bar Goal: 2500 Medals This Week</div>
+  </div>
+  <div class="ticker" id="ticker"></div>
+  <footer>
+    This material is unofficial and is not endorsed by Supercell. For more information see Supercell's Fan Content Policy.
+  </footer>
+  <script>
+    const messages = [
+      "By doing your war attacks you build confidence that attracts hot girls!",
+      "Doing your war attacks helps build wealth & increases your sex drive!",
+      "Skip a war attack? You skip a chance at glory!",
+      "Real Elders never miss their attacks!"
+    ];
+    let i = 0;
+    function updateTicker() {
+      document.getElementById('ticker').textContent = messages[i];
+      i = (i + 1) % messages.length;
+    }
+    updateTicker();
+    setInterval(updateTicker, 5000);
+  </script>
 </body>
 </html>
