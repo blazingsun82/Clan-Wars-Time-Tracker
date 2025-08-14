@@ -1,218 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Clan War Time Advisor — Simple</title>
-  <style>
-    :root{ --bg1:#0f172a; --bg2:#1e293b; --card:#0b1220cc; --muted:#94a3b8; --text:#e2e8f0; --accent:#7c3aed; --accent2:#06b6d4; --good:#22c55e; --ok:#34d399; --bad:#ef4444; }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,"Helvetica Neue",Arial; color:var(--text);
-      background: radial-gradient(1200px 600px at 20% 10%, #111827, transparent 60%),
-                  radial-gradient(1000px 500px at 80% 0%, #0b1020, transparent 60%),
-                  linear-gradient(160deg, var(--bg1), var(--bg2));}
-    .wrap{max-width:880px; margin:0 auto; padding:24px}
-    header{display:flex; align-items:center; gap:12px; margin:4px 0 16px}
-    .logo{width:44px;height:44px;border-radius:12px;background:conic-gradient(from 220deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:900;box-shadow:0 8px 30px #7c3aed44, inset 0 0 12px #06b6d455}
-    h1{margin:0;font-size:clamp(20px,3.6vw,34px)}
-    .subtitle{color:var(--muted);margin-top:2px}
-    .card{background:var(--card);backdrop-filter:blur(10px);border:1px solid #ffffff10;border-radius:18px;padding:16px;box-shadow:0 10px 30px #0008}
-    .row{display:flex;gap:10px;flex-wrap:wrap}
-    label{font-size:12px;color:var(--muted)}
-    input,button{background:#0b1220;color:var(--text);border:1px solid #ffffff1a;border-radius:12px;padding:12px 14px;font-size:14px;outline:none}
-    input:focus{border-color:#ffffff33}
-    button{cursor:pointer;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));font-weight:700;box-shadow:0 10px 25px #06b6d444;transition:transform .08s ease-in-out, filter .08s}
-    button:hover{filter:brightness(1.05)}
-    button:active{transform:translateY(1px)}
-    .results{display:grid;gap:12px;margin-top:12px}
-    .result{display:grid;gap:4px;border-left:4px solid transparent}
-    .result.best{border-color:var(--good)}
-    .result.ok{border-color:var(--ok)}
-    .result.avoid{border-color:var(--bad)}
-    .title{font-weight:800}
-    .range{font-size:20px}
-    .why{color:var(--muted);font-size:12px}
-    .muted{color:var(--muted);font-size:12px}
-    footer{margin-top:14px;color:var(--muted);font-size:12px}
-  </style>
+<meta charset="UTF-8">
+<title>Clan War Time Advisor</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #121212; color: #f0f0f0; text-align: center; padding: 2rem; }
+  h1 { color: #ffd700; }
+  label, input, button { margin: 0.5rem; font-size: 1rem; }
+  .result { margin-top: 2rem; font-size: 1.2rem; }
+  .best { color: #00ff88; }
+  .avoid { color: #ff5555; }
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="logo">⚔️</div>
-      <div>
-        <h1>Clan War Time Advisor</h1>
-        <div class="subtitle">Simple picks: Late‑night BEST, Early‑morning BEST, and one Avoid window — in your local time.</div>
-      </div>
-    </header>
-
-    <section class="card">
-      <div class="row">
-        <div style="flex:1;min-width:260px">
-          <label for="where">City or timezone</label>
-          <input id="where" list="cities" placeholder="e.g., Edmonton or America/Edmonton" />
-          <datalist id="cities"></datalist>
-        </div>
-        <div>
-          <label>&nbsp;</label>
-          <button id="useDevice">Use my device timezone</button>
-        </div>
-        <div>
-          <label>&nbsp;</label>
-          <button id="go">Get best times</button>
-        </div>
-      </div>
-      <div class="muted" id="tzEcho" style="margin-top:8px"></div>
-
-      <div class="results">
-        <div id="late" class="result best" style="display:none">
-          <div class="title">Ideal Late‑Night Attack</div>
-          <div class="range" id="lateRange">–</div>
-          <div class="why">Chosen as the quietest stretch late at night based on global evening overlap.</div>
-        </div>
-        <div id="early" class="result best" style="display:none">
-          <div class="title">Ideal Early‑Morning Attack</div>
-          <div class="range" id="earlyRange">–</div>
-          <div class="why">Lower overlap with global peaks; calmer matchups.</div>
-        </div>
-        <div id="avoid" class="result avoid" style="display:none">
-          <div class="title">Avoid Window</div>
-          <div class="range" id="avoidRange">–</div>
-          <div class="why">Heavy global overlap (many regions in evening) and the deck refresh bump near 10:00 UTC.</div>
-        </div>
-      </div>
-
-      <footer>
-        Heuristic only. No sign‑in, no reading — just type your city and press the button.
-      </footer>
-    </section>
-  </div>
-
+<h1>Clan War Time Advisor</h1>
+<p>Type your city or time zone to see the best times to attack and when to avoid, based on Europe & Middle East peak hours.</p>
+<label for="tz">City/Timezone:</label>
+<input id="tz" type="text" placeholder="e.g. America/Edmonton">
+<button onclick="advise()">Get Times</button>
+<div class="result" id="output"></div>
 <script>
-// ===== City → IANA timezone map (short list; you can add more) =====
-const CITY_TZ = Object.fromEntries([
-  ["edmonton","America/Edmonton"],["calgary","America/Edmonton"],["vancouver","America/Los_Angeles"],
-  ["toronto","America/Toronto"],["new york","America/New_York"],["london","Europe/London"],
-  ["berlin","Europe/Berlin"],["riyadh","Asia/Riyadh"],["mumbai","Asia/Kolkata"],
-  ["singapore","Asia/Singapore"],["tokyo","Asia/Tokyo"],["sydney","Australia/Sydney"]
-]);
-(function fillCities(){
-  const dl = document.getElementById('cities');
-  function titleCase(s){return s.split(' ').map(w=> w.charAt(0).toUpperCase()+w.slice(1)).join(' ');} 
-  Object.keys(CITY_TZ).sort().forEach(n=>{const o=document.createElement('option');o.value=titleCase(n);dl.appendChild(o);});
-})();
+function advise(){
+  const tz = document.getElementById('tz').value || Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-// ===== Core idea (simple): =====
-// 1) Assume each region's peak = 18:00–23:00 local.
-// 2) For each 30-min slot of YOUR day, count how many regions are in peak.
-// 3) Pick one BEST late-night window and one BEST early-morning window.
-// 4) Pick one AVOID evening window (and include 10:00 UTC bump).
+  // Europe & Middle East evening peak hours in UTC
+  const peakStartUTC = 16; // 4 PM UTC
+  const peakEndUTC = 21;   // 9 PM UTC
 
-const REGIONS = [
-  ["USA West","America/Los_Angeles"],
-  ["USA Central","America/Chicago"],
-  ["USA East","America/New_York"],
-  ["UK/Ireland","Europe/London"],
-  ["Central Europe","Europe/Berlin"],
-  ["Middle East","Asia/Riyadh"],
-  ["India","Asia/Kolkata"],
-  ["Southeast Asia","Asia/Singapore"],
-  ["Japan","Asia/Tokyo"],
-  ["Australia East","Australia/Sydney"],
-];
-
-function minutes(h,m){return h*60+m;}
-function inWindow(h,m, sH,sM, eH,eM){
-  const t=minutes(h,m), a=minutes(sH,sM), b=minutes(eH,eM);
-  return (a<=b)? (t>=a&&t<=b) : (t>=a||t<=b);
-}
-function fmt12(h,m){const am=h>=12?'PM':'AM';const hh=((h+11)%12)+1;const mm=String(m).padStart(2,'0');return `${hh}:${mm} ${am}`;}
-function rangeFmt(h1,m1,h2,m2){const same=(h2*60+m2)>=(h1*60+m1);return `${fmt12(h1,m1)} – ${fmt12(h2,m2)}${same?'':' (+1)'}`;}
-
-function hmInTZ(dateUTC, timeZone){
-  const f=new Intl.DateTimeFormat('en-GB',{timeZone,hourCycle:'h23',hour:'2-digit',minute:'2-digit',year:'numeric',month:'2-digit',day:'2-digit'});
-  let h=0,m=0,d=0;for(const p of f.formatToParts(dateUTC)){if(p.type==='hour')h=+p.value; if(p.type==='minute')m=+p.value; if(p.type==='day')d=+p.value;}return {h:h,m:m,day:d};
-}
-
-function resolveTZ(input){
-  const s=(input||'').trim(); if(!s) return null; const key=s.toLowerCase();
-  if(CITY_TZ[key]) return CITY_TZ[key]; const guess=key.split(',')[0].trim(); if(CITY_TZ[guess]) return CITY_TZ[guess]; return s;
-}
-
-function buildSlots(userTZ){
-  const now=new Date(); const base=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),0,0,0));
-  const step=30; const slots=[]; const baseDay=hmInTZ(base,userTZ).day;
-  const peakS={h:18,m:0}, peakE={h:23,m:0}; // 18:00–23:00 local per region
-  for(let i=0;i<48;i++){
-    const t=new Date(base.getTime()+i*step*60000); const u=hmInTZ(t,userTZ); const norm=u.h*60+u.m + (hmInTZ(t,userTZ).day===baseDay?0:1440);
-    let count=0; for(const [,tz] of REGIONS){const r=hmInTZ(t,tz); if(inWindow(r.h,r.m,peakS.h,peakS.m,peakE.h,peakE.m)) count++;}
-    // deck refresh bump 10:00 UTC ±60
-    const utc=hmInTZ(t,'UTC'); const diff=Math.abs(minutes(utc.h,utc.m)-minutes(10,0)); const wrap=Math.min(diff,1440-diff); const bump=wrap<=60;
-    const label=(bump||count>=3)?'avoid': (count>=2?'peak': (count===1?'ok':'best'));
-    slots.push({t,label,u, norm, count, bump});
+  function utcToLocal(utcHour){
+    const now = new Date();
+    now.setUTCHours(utcHour, 0, 0, 0);
+    return new Date(now.toLocaleString('en-US', { timeZone: tz }));
   }
-  slots.sort((a,b)=>a.norm-b.norm); return slots;
+
+  const localPeakStart = utcToLocal(peakStartUTC);
+  const localPeakEnd = utcToLocal(peakEndUTC);
+
+  // Best evening: 1–3 hours after peak ends
+  let eveningBestStart = new Date(localPeakEnd);
+  eveningBestStart.setHours(localPeakEnd.getHours() + 1);
+  let eveningBestEnd = new Date(eveningBestStart);
+  eveningBestEnd.setHours(eveningBestStart.getHours() + 2);
+
+  // Best morning: 4–2 hours before peak starts
+  let morningBestStart = new Date(localPeakStart);
+  morningBestStart.setHours(localPeakStart.getHours() - 4);
+  let morningBestEnd = new Date(morningBestStart);
+  morningBestEnd.setHours(morningBestStart.getHours() + 2);
+
+  function fmt(t){ return t.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}); }
+
+  document.getElementById('output').innerHTML = `
+    <div class='best'>Evening Best: ${fmt(eveningBestStart)} – ${fmt(eveningBestEnd)}</div>
+    <div class='best'>Morning Best: ${fmt(morningBestStart)} – ${fmt(morningBestEnd)}</div>
+    <div class='avoid'>Avoid: ${fmt(localPeakStart)} – ${fmt(localPeakEnd)}</div>
+  `;
 }
-
-function pickBest(slots, winStart, winEnd){
-  // Return longest contiguous BEST/OK block within [winStart,winEnd] (minutes of day, may cross midnight if end < start)
-  const inWin=(m)=> (winStart<=winEnd)? (m>=winStart&&m<=winEnd) : (m>=winStart||m<=winEnd-1440);
-  let best=null; let cur=null;
-  for(const s of slots){
-    const m=s.norm%1440; if(!inWin(m)) {cur=null; continue;}
-    if(s.label==='best' || s.label==='ok'){
-      if(!cur) cur={start:s, end:s};
-      else if((s.norm - cur.end.norm)===30) cur.end=s;
-      else { if(!best|| (cur.end.norm-cur.start.norm)>(best.end.norm-best.start.norm)) best=cur; cur={start:s, end:s}; }
-    } else {
-      if(cur){ if(!best|| (cur.end.norm-cur.start.norm)>(best.end.norm-best.start.norm)) best=cur; cur=null; }
-    }
-  }
-  if(cur && (!best || (cur.end.norm-cur.start.norm)>(best.end.norm-best.start.norm))) best=cur;
-  if(!best) return null; const a=best.start.u, b=best.end.u; return [a.h,a.m,b.h,b.m];
-}
-
-function pickAvoid(slots){
-  // Evening-focused avoid: merge AVOID/PEAK between 16:00–23:59; include any bump slots.
-  const start=16*60, end=23*60+59; let first=null, last=null;
-  for(const s of slots){
-    const m=s.norm%1440; const inEvening=(m>=start && m<=end);
-    if((inEvening && (s.label==='avoid'||s.label==='peak')) || s.bump){
-      if(first===null) first=s; last=s;
-    }
-  }
-  if(!first) return null; return [first.u.h, first.u.m, last.u.h, last.u.m];
-}
-
-function run(){
-  const tz = resolveTZ(document.getElementById('where').value.trim()) || Intl.DateTimeFormat().resolvedOptions().timeZone;
-  document.getElementById('tzEcho').textContent = `Using time zone: ${tz}`;
-  let slots; try{ slots = buildSlots(tz);}catch{ alert('Time zone not recognized. Try an IANA name like "America/Edmonton".'); return; }
-
-  const late = pickBest(slots, 21*60, 2*60);   // 21:00–02:00
-  const early = pickBest(slots, 4*60, 10*60);  // 04:00–10:00
-  const avoid = pickAvoid(slots);
-
-  const show = (id, range) => {
-    const el = document.getElementById(id);
-    el.style.display = range? 'grid':'none';
-    if(range){
-      const rId = id + 'Range';
-      const e = document.getElementById(rId);
-      e.textContent = rangeFmt(range[0],range[1],range[2],range[3]);
-    }
-  };
-
-  show('late', late); show('early', early); show('avoid', avoid);
-}
-
-// UI hooks
- document.getElementById('go').addEventListener('click', run);
- document.getElementById('useDevice').addEventListener('click', ()=>{
-   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-   document.getElementById('where').value = tz;
- });
 </script>
 </body>
 </html>
