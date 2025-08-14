@@ -14,70 +14,74 @@
   .result { margin-top: 2rem; font-size: 1.3rem; }
   .best { color: #00ff88; font-weight: bold; text-shadow: 0 0 5px rgba(0,255,136,0.6); }
   .avoid { color: #ff5555; font-weight: bold; text-shadow: 0 0 5px rgba(255,85,85,0.6); }
-  .elder-bar { margin-top: 1rem; font-size: 1.2rem; color: #87cefa; font-weight: bold; }
-  .ticker { margin-top: 2rem; background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 5px; overflow: hidden; white-space: nowrap; }
-  .ticker span { display: inline-block; padding-left: 100%; animation: scroll 15s linear infinite; }
-  @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+  .clanbar { margin: 0.3rem auto 1rem; font-size: 1.1rem; }
+  .clanbar .name { font-weight: 800; color:#7dd3fc; }
+  .clanbar .elder { display:inline-block; margin-left:10px; padding:4px 10px; border-radius:999px; background:#0b1220; border:1px solid #ffffff22; color:#e2e8f0; }
+  .ticker-wrap{ position:fixed; left:0; right:0; bottom:0; background:linear-gradient(90deg,#0b1020,#1a1030); border-top:1px solid #ffffff22; padding:6px 0; box-shadow:0 -8px 24px rgba(0,0,0,.35); }
+  .ticker{ overflow:hidden; white-space:nowrap; }
+  .ticker-line{ display:inline-block; padding-left:100%; animation: ticker 18s linear infinite; font-weight:700; letter-spacing:.3px; }
+  .tag{ display:inline-block; margin:0 10px; padding:.2rem .5rem; border-radius:999px; background:#ffd700; color:#1b1b2b; }
+  @keyframes ticker{ 0%{ transform: translateX(0);} 100%{ transform: translateX(-100%);} }
 </style>
 </head>
 <body>
 <h1>Clan War Time Advisor</h1>
-<p>Welcome to <strong>Edmontonation</strong>! Type your city or time zone to see the best times to attack and when to avoid, based on Europe & Middle East peak hours.</p>
-<div class="elder-bar">🏅 Elder Bar this week: 2500 War Medals</div>
+<p>Welcome to <strong id="clanName"></strong>! Type your city or time zone to see the best times to attack and when to avoid, based on Europe & Middle East peak hours.</p>
+<div id="clanBar" class="clanbar"></div>
 <label for="tz">City/Timezone:</label>
 <input id="tz" type="text" placeholder="e.g. America/Edmonton">
 <button onclick="advise()">Get Times</button>
 <div class="result" id="output"></div>
-<div class="ticker"><span id="ticker-text"></span></div>
+<div class="ticker-wrap"><div class="ticker"><span class="ticker-line" id="tickerLine"></span></div></div>
 <script>
-const messages = [
-  "By doing your war attacks, you'll build confidence that attracts hot girls",
-  "Doing your war attacks helps build wealth & increases your sex drive",
-  "Skip your attacks and you'll skip your gains — in war and in life",
-  "War attacks: The gym workout for your clan status"
+const CLAN_NAME = "Edmontonation";
+const ELDER_BAR_MEDALS = 2500;
+const ADULT_BANTER = [
+  "By doing your war attacks you build confidence — and confidence attracts hot girls.",
+  "Doing your war attacks helps build wealth and can increase your sex drive.",
+  "Skip excuses, do war attacks — future you says thanks (and so will your DMs).",
+  "Real Elders finish their war attacks before breakfast.",
+  "War medals today, bragging rights tonight."
 ];
 
-function setTicker() {
-  document.getElementById('ticker-text').textContent = messages[Math.floor(Math.random() * messages.length)];
-}
+document.getElementById('clanName').textContent = CLAN_NAME;
+document.getElementById('clanBar').innerHTML = `<span class="name">Clan: ${CLAN_NAME}</span> · <span class="elder">Elder Bar: ${ELDER_BAR_MEDALS} medals (this week)</span>`;
+
+(function startTicker(){
+  const line = document.getElementById('tickerLine');
+  function build(){
+    const picks = [...ADULT_BANTER].sort(()=>Math.random()-0.5).slice(0,3);
+    line.innerHTML = `<span class="tag">NEWS</span> ` + picks.join("  •  ") + "  •  ";
+  }
+  build();
+  setInterval(build, 36000);
+})();
 
 function advise(){
   const tz = document.getElementById('tz').value || Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-  // Europe & Middle East evening peak hours in UTC
-  const peakStartUTC = 16; // 4 PM UTC
-  const peakEndUTC = 21;   // 9 PM UTC
-
+  const peakStartUTC = 16;
+  const peakEndUTC = 21;
   function utcToLocal(utcHour){
     const now = new Date();
     now.setUTCHours(utcHour, 0, 0, 0);
     return new Date(now.toLocaleString('en-US', { timeZone: tz }));
   }
-
   const localPeakStart = utcToLocal(peakStartUTC);
   const localPeakEnd = utcToLocal(peakEndUTC);
-
-  // Best evening: 1–3 hours after peak ends
   let eveningBestStart = new Date(localPeakEnd);
   eveningBestStart.setHours(localPeakEnd.getHours() + 1);
   let eveningBestEnd = new Date(eveningBestStart);
   eveningBestEnd.setHours(eveningBestStart.getHours() + 2);
-
-  // Best morning: 4–2 hours before peak starts
   let morningBestStart = new Date(localPeakStart);
   morningBestStart.setHours(localPeakStart.getHours() - 4);
   let morningBestEnd = new Date(morningBestStart);
   morningBestEnd.setHours(morningBestStart.getHours() + 2);
-
   function fmt(t){ return t.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}); }
-
   document.getElementById('output').innerHTML = `
     <div class='best'>🌙 Evening Best: ${fmt(eveningBestStart)} – ${fmt(eveningBestEnd)}</div>
     <div class='best'>☀️ Morning Best: ${fmt(morningBestStart)} – ${fmt(morningBestEnd)}</div>
     <div class='avoid'>🚫 Avoid: ${fmt(localPeakStart)} – ${fmt(localPeakEnd)}</div>
   `;
-
-  setTicker();
 }
 </script>
 </body>
