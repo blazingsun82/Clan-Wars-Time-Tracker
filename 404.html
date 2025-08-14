@@ -1,4 +1,4 @@
-<!-- Edmontonation — War Time Advisor (simplified and cleaner) -->
+<!-- Edmontonation — War Time Advisor with flare restored -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,17 +7,17 @@
 <title>Edmontonation — War Time Advisor</title>
 <style>
   body { margin: 0; font-family: Arial, sans-serif; background: #0b0f19; color: #fff; text-align: center; }
-  .banner { background: linear-gradient(90deg,#86198f,#7c3aed,#06b6d4); padding: 20px; font-size: 2.5rem; font-weight: bold; }
-  .elder { font-size: 1.2rem; margin-top: 5px; }
+  .banner { background: linear-gradient(90deg,#ffcc00,#ff0066,#9900ff); padding: 30px; font-size: 3rem; font-weight: bold; text-shadow: 2px 2px 8px #000; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+  .elder { font-size: 1.4rem; margin-top: 8px; background: rgba(0,0,0,0.3); display: inline-block; padding: 5px 15px; border-radius: 20px; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
   .bar { margin: 20px auto; max-width: 600px; }
-  input, button { padding: 10px; margin: 5px; border-radius: 8px; border: none; }
+  input, button { padding: 10px; margin: 5px; border-radius: 8px; border: none; font-size: 1rem; }
   .cards { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 20px; }
-  .card { background: #12172a; padding: 15px; border-radius: 12px; width: 200px; }
-  .ok { color: #22c55e; font-weight: bold; }
-  .avoid { color: #ef4444; font-weight: bold; }
-  .ticker-wrap { background: #1a1030; padding: 10px; position: fixed; bottom: 0; left: 0; right: 0; }
+  .card { background: #12172a; padding: 15px; border-radius: 12px; width: 200px; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+  .ok { color: #22c55e; font-weight: bold; font-size: 1.2rem; }
+  .avoid { color: #ef4444; font-weight: bold; font-size: 1.2rem; }
+  .ticker-wrap { background: #1a1030; padding: 10px; position: fixed; bottom: 0; left: 0; right: 0; overflow: hidden; }
   .ticker-line { animation: ticker 18s linear infinite; white-space: nowrap; display: inline-block; }
-  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+  @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 </style>
 </head>
 <body>
@@ -45,7 +45,20 @@ function show(t){ document.getElementById('eveningBest').textContent=t.eveningBe
 document.getElementById('useDevice').onclick=()=>{ document.getElementById('where').value = Intl.DateTimeFormat().resolvedOptions().timeZone; };
 document.getElementById('go').onclick=()=>{ const tz = resolveTZ(document.getElementById('where').value || Intl.DateTimeFormat().resolvedOptions().timeZone); try{ show(compute(tz)); }catch{ alert('Invalid timezone'); } };
 (function init(){ const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Edmonton'; document.getElementById('where').value=tz; show(compute(tz)); })();
-const ADULT_BANTER = ["By doing your war attacks you build confidence — and confidence attracts hot girls.","Doing your war attacks helps build wealth and can increase your sex drive.","Real Elders finish their war attacks before breakfast.","War medals today, bragging rights tonight."];
+const ADULT_BANTER = [
+  "By doing your war attacks you build confidence — and confidence attracts hot girls.",
+  "Doing your war attacks helps build wealth and can increase your sex drive.",
+  "Real Elders finish their war attacks before breakfast.",
+  "War medals today, bragging rights tonight.",
+  "Attack now, Netflix later — priorities, champ.",
+  "Skip the gym, flex your deck.",
+  "Every crown is a step closer to being irresistible.",
+  "War attacks: the real pre-workout.",
+  "Pull an all-nighter? Only if it’s for clan glory.",
+  "War wins look better than six-packs.",
+  "Hot dates love high medal counts.",
+  "Doing your war attacks is the ultimate alpha move."
+];
 let idx = 0; function rotateTicker(){ document.getElementById('tickerLine').textContent = ADULT_BANTER[idx++ % ADULT_BANTER.length]; }
 rotateTicker(); setInterval(rotateTicker, 9000);
 </script>
