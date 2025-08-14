@@ -1,4 +1,4 @@
-<!-- Edmontonation — War Time Advisor with flare restored -->
+<!-- Edmontonation — War Time Advisor (professional black & gold) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,45 +6,167 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Edmontonation — War Time Advisor</title>
 <style>
-  body { margin: 0; font-family: Arial, sans-serif; background: #0b0f19; color: #fff; text-align: center; }
-  .banner { background: linear-gradient(90deg,#ffcc00,#ff0066,#9900ff); padding: 30px; font-size: 3rem; font-weight: bold; text-shadow: 2px 2px 8px #000; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
-  .elder { font-size: 1.4rem; margin-top: 8px; background: rgba(0,0,0,0.3); display: inline-block; padding: 5px 15px; border-radius: 20px; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
-  .bar { margin: 20px auto; max-width: 600px; }
-  input, button { padding: 10px; margin: 5px; border-radius: 8px; border: none; font-size: 1rem; }
-  .cards { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 20px; }
-  .card { background: #12172a; padding: 15px; border-radius: 12px; width: 200px; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
-  .ok { color: #22c55e; font-weight: bold; font-size: 1.2rem; }
-  .avoid { color: #ef4444; font-weight: bold; font-size: 1.2rem; }
-  .ticker-wrap { background: #1a1030; padding: 10px; position: fixed; bottom: 0; left: 0; right: 0; overflow: hidden; }
-  .ticker-line { animation: ticker 18s linear infinite; white-space: nowrap; display: inline-block; }
-  @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+  :root{
+    --bg:#0b0f19; --panel:#0f1527; --ink:#e6edf3; --muted:#9aa4b2; --gold:#d4af37; --gold-hi:#f5d97a; --edge:#ffffff1a;
+    --ok:#22c55e; --bad:#ef4444;
+  }
+  *{box-sizing:border-box}
+  body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial; background: radial-gradient(900px 500px at 15% 10%, #12172a 0, #0b0f19 60%), linear-gradient(160deg, #0b0f19, #0a0d18); color: var(--ink); text-align:center }
+
+  /* Banner */
+  .banner{ position:relative; padding:28px 16px; background:linear-gradient(180deg,#0f1322 0,#0b0f19 70%); border-bottom:1px solid var(--edge); box-shadow:0 12px 32px #0008 }
+  .brand{ display:inline-flex; align-items:center; gap:14px }
+  .crest{ width:58px; height:58px; border-radius:16px; background:linear-gradient(135deg,#1b213a,#0f1527); border:1px solid var(--edge); display:grid; place-items:center; font-size:26px; color:var(--gold-hi); box-shadow: inset 0 0 12px #0008, 0 6px 18px #0007 }
+  .title{ font-weight:900; letter-spacing:1px; font-size:clamp(28px,5vw,44px) }
+  .title .accent{ background:linear-gradient(90deg,var(--gold),var(--gold-hi)); -webkit-background-clip:text; background-clip:text; color:transparent }
+  .elder{ margin:8px auto 0; display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:999px; background:linear-gradient(90deg,#1a2038,#11182e); border:1px solid var(--edge); font-weight:700 }
+  .elder .dot{ width:8px; height:8px; border-radius:50%; background:linear-gradient(180deg,var(--gold-hi),var(--gold)); box-shadow:0 0 8px var(--gold) }
+
+  /* Controls */
+  .bar{ max-width:960px; margin:18px auto 0; padding:0 16px }
+  .bar-inner{ display:flex; align-items:center; gap:10px; background:var(--panel); border:1px solid var(--edge); border-radius:14px; padding:10px 12px; box-shadow:0 10px 28px #0007 }
+  .grow{ flex:1; min-width:260px }
+  input, button, datalist{ font-size:14px }
+  input{ width:100%; padding:11px 12px; border-radius:10px; border:1px solid var(--edge); background:#0b1220; color:var(--ink); outline:none }
+  input:focus{ border-color:#ffffff33 }
+  button{ padding:11px 12px; border:none; border-radius:10px; font-weight:800; cursor:pointer }
+  .btn-ghost{ background:#0c1222; color:var(--ink); border:1px solid var(--edge) }
+  .btn-ghost:hover{ filter:brightness(1.05) }
+  .btn-gold{ background:linear-gradient(135deg,var(--gold),var(--gold-hi)); color:#111; box-shadow:0 10px 24px #0008 }
+  .btn-gold:hover{ filter:brightness(1.05) }
+
+  /* Section title */
+  .section-title{ font-size:1.1rem; margin:10px 0 4px; color:var(--muted) }
+
+  /* Cards */
+  .cards{ max-width:960px; margin:14px auto 24px; display:grid; gap:12px; padding:0 16px }
+  @media(min-width:820px){ .cards{ grid-template-columns:repeat(3,1fr) } }
+  .card{ background:var(--panel); border:1px solid var(--edge); border-radius:14px; padding:14px; box-shadow:0 10px 28px #0007 }
+  .card h3{ margin:0 0 6px; font-size:16px; color:var(--muted) }
+  .range{ font-size:20px; font-weight:900 }
+  .ok{ color:var(--ok) }
+  .avoid{ color:var(--bad) }
+
+  /* Ticker */
+  .ticker-wrap{ position:fixed; left:0; right:0; bottom:0; background:linear-gradient(90deg,#0b1020,#11162a); border-top:1px solid var(--edge); padding:6px 0; box-shadow:0 -10px 24px #0007 }
+  .ticker{ overflow:hidden; white-space:nowrap }
+  .ticker-line{ display:inline-block; padding-left:100%; animation:ticker 18s linear infinite; font-weight:800; letter-spacing:.3px }
+  @keyframes ticker{ 0%{ transform:translateX(0) } 100%{ transform:translateX(-100%) } }
 </style>
 </head>
 <body>
-  <div class="banner">EDMONTONATION<div class="elder">Elder Bar: 2500 medals</div></div>
-  <div class="bar">
-    <input id="where" placeholder="Enter city or timezone" />
-    <button id="useDevice">Use my timezone</button>
-    <button id="go">Get times</button>
-  </div>
-  <div style="font-size:1.5rem; margin-bottom:10px;">Clan War Time Advisor</div>
-  <div class="cards">
-    <div class="card"><div>Evening — Best</div><div class="ok" id="eveningBest">–</div></div>
-    <div class="card"><div>Morning — Best</div><div class="ok" id="morningBest">–</div></div>
-    <div class="card"><div>Avoid</div><div class="avoid" id="avoidWin">–</div></div>
-  </div>
-  <div class="ticker-wrap"><span class="ticker-line" id="tickerLine"></span></div>
+  <!-- Sleek banner -->
+  <header class="banner">
+    <div class="brand">
+      <div class="crest">⚔️</div>
+      <div class="title"><span class="accent">EDMONTONATION</span></div>
+    </div>
+    <div class="elder"><span class="dot"></span> <span id="elderText">Elder Bar: 2500 medals</span></div>
+  </header>
+
+  <!-- Controls -->
+  <section class="bar" aria-label="War Time Advisor controls">
+    <div class="bar-inner">
+      <div class="grow">
+        <input id="where" list="cities" placeholder="Type a city (e.g., Edmonton) or timezone (e.g., America/Edmonton)" />
+        <datalist id="cities"></datalist>
+      </div>
+      <button id="useDevice" class="btn-ghost" type="button" title="Use my device timezone">Use my timezone</button>
+      <button id="go" class="btn-gold" type="button">Get times</button>
+    </div>
+  </section>
+
+  <div class="section-title">Clan War Time Advisor</div>
+
+  <!-- Results -->
+  <section class="cards" aria-live="polite">
+    <div class="card"><h3>Evening — Best</h3><div class="range ok" id="eveningBest">–</div></div>
+    <div class="card"><h3>Morning — Best</h3><div class="range ok" id="morningBest">–</div></div>
+    <div class="card"><h3>Avoid</h3><div class="range avoid" id="avoidWin">–</div></div>
+  </section>
+
+  <!-- Ticker -->
+  <div class="ticker-wrap" aria-live="polite"><div class="ticker"><span class="ticker-line" id="tickerLine"></span></div></div>
+
 <script>
-const CITY_TZ = { "edmonton":"America/Edmonton","calgary":"America/Edmonton","vancouver":"America/Los_Angeles","toronto":"America/Toronto","london":"Europe/London","berlin":"Europe/Berlin","riyadh":"Asia/Riyadh" };
-function utcHourToLocalRange(tz, startUTC, endUTC){ const base = new Date(); const s = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), startUTC)); const e = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), endUTC)); const sLocal = new Date(s.toLocaleString('en-US', { timeZone: tz })); const eLocal = new Date(e.toLocaleString('en-US', { timeZone: tz })); return [sLocal, eLocal]; }
+/* ===== City → IANA timezone map + datalist fill ===== */
+const CITY_TZ = Object.fromEntries([
+  ["edmonton","America/Edmonton"],["calgary","America/Edmonton"],["vancouver","America/Los_Angeles"],
+  ["toronto","America/Toronto"],["new york","America/New_York"],["chicago","America/Chicago"],
+  ["london","Europe/London"],["paris","Europe/Paris"],["berlin","Europe/Berlin"],["madrid","Europe/Madrid"],
+  ["riyadh","Asia/Riyadh"],["dubai","Asia/Dubai"],["mumbai","Asia/Kolkata"],["singapore","Asia/Singapore"],
+  ["tokyo","Asia/Tokyo"],["sydney","Australia/Sydney"]
+]);
+(function fillCities(){
+  const dl = document.getElementById('cities');
+  const names = Object.keys(CITY_TZ).sort();
+  const toTitle = s=>s.replace(/\b\w/g,c=>c.toUpperCase());
+  names.forEach(n=>{ const opt=document.createElement('option'); opt.value=toTitle(n); dl.appendChild(opt); });
+})();
+
+/* ===== Helpers ===== */
+function utcHourToLocalRange(tz, startUTC, endUTC){
+  const base = new Date();
+  const s = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), startUTC));
+  const e = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), endUTC));
+  const sLocal = new Date(s.toLocaleString('en-US', { timeZone: tz }));
+  const eLocal = new Date(e.toLocaleString('en-US', { timeZone: tz }));
+  return [sLocal, eLocal];
+}
 function fmt(t){ return t.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
-function resolveTZ(input){ const key = input.trim().toLowerCase(); if(CITY_TZ[key]) return CITY_TZ[key]; return input; }
+function resolveTZ(input){
+  const s=(input||'').trim(); if(!s) return null; const key=s.toLowerCase();
+  if(CITY_TZ[key]) return CITY_TZ[key];
+  const guess=key.split(',')[0].trim(); if(CITY_TZ[guess]) return CITY_TZ[guess];
+  return s; // assume IANA name
+}
+
+/* ===== Core logic (EU/ME aggregate peak 16:00–21:00 UTC) ===== */
 const PEAK_START_UTC = 16, PEAK_END_UTC = 21;
-function compute(tz){ const [ps, pe] = utcHourToLocalRange(tz, PEAK_START_UTC, PEAK_END_UTC); const eveS = new Date(pe); eveS.setHours(eveS.getHours()+1); const eveE = new Date(eveS); eveE.setHours(eveE.getHours()+2); const mornS = new Date(ps); mornS.setHours(mornS.getHours()-4); const mornE = new Date(mornS); mornE.setHours(mornE.getHours()+2); return { eveningBest: `${fmt(eveS)} – ${fmt(eveE)}`, morningBest: `${fmt(mornS)} – ${fmt(mornE)}`, avoid: `${fmt(ps)} – ${fmt(pe)}` }; }
-function show(t){ document.getElementById('eveningBest').textContent=t.eveningBest; document.getElementById('morningBest').textContent=t.morningBest; document.getElementById('avoidWin').textContent=t.avoid; }
-document.getElementById('useDevice').onclick=()=>{ document.getElementById('where').value = Intl.DateTimeFormat().resolvedOptions().timeZone; };
-document.getElementById('go').onclick=()=>{ const tz = resolveTZ(document.getElementById('where').value || Intl.DateTimeFormat().resolvedOptions().timeZone); try{ show(compute(tz)); }catch{ alert('Invalid timezone'); } };
-(function init(){ const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Edmonton'; document.getElementById('where').value=tz; show(compute(tz)); })();
+function compute(tz){
+  const [ps, pe] = utcHourToLocalRange(tz, PEAK_START_UTC, PEAK_END_UTC);
+  const eveS = new Date(pe); eveS.setHours(eveS.getHours()+1);
+  const eveE = new Date(eveS); eveE.setHours(eveS.getHours()+2);
+  const mornS = new Date(ps); mornS.setHours(mornS.getHours()-4);
+  const mornE = new Date(mornS); mornE.setHours(mornS.getHours()+2);
+  return { eveningBest:`${fmt(eveS)} – ${fmt(eveE)}`, morningBest:`${fmt(mornS)} – ${fmt(mornE)}`, avoid:`${fmt(ps)} – ${fmt(pe)}` };
+}
+function show(t){
+  document.getElementById('eveningBest').textContent=t.eveningBest;
+  document.getElementById('morningBest').textContent=t.morningBest;
+  document.getElementById('avoidWin').textContent=t.avoid;
+}
+
+/* ===== Controls wiring ===== */
+const inputEl = document.getElementById('where');
+
+document.getElementById('useDevice').onclick=()=>{
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+  inputEl.value = tz;
+  if(tz){ show(compute(tz)); }
+};
+
+document.getElementById('go').onclick=()=>{
+  const raw = inputEl.value || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const tz = resolveTZ(raw || 'America/Edmonton');
+  try{ show(compute(tz)); }catch{ alert('Timezone not recognized. Try a city from the list or an IANA name like America/Edmonton.'); }
+};
+
+// Press Enter to run
+inputEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ document.getElementById('go').click(); }});
+
+// Initial render: use device tz if available, else Edmonton
+(function init(){
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Edmonton';
+  inputEl.value = tz;
+  show(compute(tz));
+})();
+
+/* ===== Elder Bar (editable weekly) ===== */
+const ELDER_BAR_MEDALS = 2500; // update weekly
+(function(){ document.getElementById('elderText').textContent = `Elder Bar: ${ELDER_BAR_MEDALS} medals`; })();
+
+/* ===== Ticker lines ===== */
 const ADULT_BANTER = [
   "By doing your war attacks you build confidence — and confidence attracts hot girls.",
   "Doing your war attacks helps build wealth and can increase your sex drive.",
