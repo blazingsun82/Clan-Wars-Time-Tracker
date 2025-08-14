@@ -4,22 +4,43 @@
 <meta charset="UTF-8">
 <title>Clan War Time Advisor</title>
 <style>
-  body { font-family: Arial, sans-serif; background: #121212; color: #f0f0f0; text-align: center; padding: 2rem; }
-  h1 { color: #ffd700; }
-  label, input, button { margin: 0.5rem; font-size: 1rem; }
-  .result { margin-top: 2rem; font-size: 1.2rem; }
-  .best { color: #00ff88; }
-  .avoid { color: #ff5555; }
+  body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #1e1e2f, #121212); color: #f0f0f0; text-align: center; padding: 2rem; }
+  h1 { color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.7); font-size: 2.5rem; }
+  p { max-width: 600px; margin: auto; font-size: 1.1rem; color: #ccc; }
+  label { font-weight: bold; }
+  input { padding: 0.5rem; border: none; border-radius: 5px; }
+  button { background: #ffd700; border: none; border-radius: 5px; padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; transition: background 0.3s; }
+  button:hover { background: #ffcc33; }
+  .result { margin-top: 2rem; font-size: 1.3rem; }
+  .best { color: #00ff88; font-weight: bold; text-shadow: 0 0 5px rgba(0,255,136,0.6); }
+  .avoid { color: #ff5555; font-weight: bold; text-shadow: 0 0 5px rgba(255,85,85,0.6); }
+  .elder-bar { margin-top: 1rem; font-size: 1.2rem; color: #87cefa; font-weight: bold; }
+  .ticker { margin-top: 2rem; background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 5px; overflow: hidden; white-space: nowrap; }
+  .ticker span { display: inline-block; padding-left: 100%; animation: scroll 15s linear infinite; }
+  @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 </style>
 </head>
 <body>
 <h1>Clan War Time Advisor</h1>
-<p>Type your city or time zone to see the best times to attack and when to avoid, based on Europe & Middle East peak hours.</p>
+<p>Welcome to <strong>Edmontonation</strong>! Type your city or time zone to see the best times to attack and when to avoid, based on Europe & Middle East peak hours.</p>
+<div class="elder-bar">🏅 Elder Bar this week: 2500 War Medals</div>
 <label for="tz">City/Timezone:</label>
 <input id="tz" type="text" placeholder="e.g. America/Edmonton">
 <button onclick="advise()">Get Times</button>
 <div class="result" id="output"></div>
+<div class="ticker"><span id="ticker-text"></span></div>
 <script>
+const messages = [
+  "By doing your war attacks, you'll build confidence that attracts hot girls",
+  "Doing your war attacks helps build wealth & increases your sex drive",
+  "Skip your attacks and you'll skip your gains — in war and in life",
+  "War attacks: The gym workout for your clan status"
+];
+
+function setTicker() {
+  document.getElementById('ticker-text').textContent = messages[Math.floor(Math.random() * messages.length)];
+}
+
 function advise(){
   const tz = document.getElementById('tz').value || Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -51,10 +72,12 @@ function advise(){
   function fmt(t){ return t.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}); }
 
   document.getElementById('output').innerHTML = `
-    <div class='best'>Evening Best: ${fmt(eveningBestStart)} – ${fmt(eveningBestEnd)}</div>
-    <div class='best'>Morning Best: ${fmt(morningBestStart)} – ${fmt(morningBestEnd)}</div>
-    <div class='avoid'>Avoid: ${fmt(localPeakStart)} – ${fmt(localPeakEnd)}</div>
+    <div class='best'>🌙 Evening Best: ${fmt(eveningBestStart)} – ${fmt(eveningBestEnd)}</div>
+    <div class='best'>☀️ Morning Best: ${fmt(morningBestStart)} – ${fmt(morningBestEnd)}</div>
+    <div class='avoid'>🚫 Avoid: ${fmt(localPeakStart)} – ${fmt(localPeakEnd)}</div>
   `;
+
+  setTicker();
 }
 </script>
 </body>
