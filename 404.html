@@ -1,4 +1,4 @@
-<!-- Edmontonation — War Time Advisor (simple, clean, working) -->
+<!-- Edmontonation — War Time Advisor (simplified and cleaner) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,216 +6,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Edmontonation — War Time Advisor</title>
 <style>
-  :root{
-    --bg:#0b0f19; --bg2:#12172a; --gold:#ffd54a; --accent:#7c3aed; --accent2:#06b6d4;
-    --muted:#a7b0c0; --text:#e6edf3; --card:#0e1424; --glass:#0b1220cc; --good:#22c55e; --bad:#ef4444;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,Arial;background:radial-gradient(900px 500px at 20% 10%,#12172a 0,#0b0f19 60%),linear-gradient(160deg,var(--bg),var(--bg2));color:var(--text)}
-
-  /* ===== Banner ===== */
-  .banner{position:relative;display:flex;align-items:center;justify-content:center;gap:16px;padding:22px 16px;background:linear-gradient(90deg,#86198f,#7c3aed,#06b6d4);box-shadow:0 8px 40px #0006}
-  .crest{width:64px;height:64px;border-radius:16px;background:conic-gradient(from 220deg,var(--accent),var(--accent2));display:grid;place-items:center;color:#fff;font-size:28px;box-shadow:0 10px 28px #0008, inset 0 0 14px #ffffff33}
-  .title{font-size:clamp(28px,5vw,48px);font-weight:900;letter-spacing:1px;text-shadow:0 3px 18px #0009}
-  .sub{color:#101322;background:rgba(255,213,74,.95);padding:6px 12px;border-radius:999px;font-weight:900;margin-left:12px;box-shadow:0 6px 18px #0006}
-  .elder{position:absolute;right:16px;bottom:10px;background:#0b1220; border:1px solid #ffffff2a; color:#e6edf3; padding:6px 10px;border-radius:999px;font-weight:700}
-
-  /* ===== Advisor bar ===== */
-  .bar{max-width:1000px;margin:18px auto 0;padding:0 16px}
-  .bar-inner{display:flex;align-items:center;gap:12px;background:var(--glass);border:1px solid #ffffff15;border-radius:16px;padding:10px 12px;backdrop-filter:blur(10px);box-shadow:0 8px 24px #0006}
-  .bar h2{margin:0;font-size:18px;white-space:nowrap}
-  .bar small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
-  .grow{flex:1}
-  input{width:100%;background:#0b1220;color:var(--text);border:1px solid #ffffff24;border-radius:12px;padding:10px 12px;font-size:14px;outline:none}
-  input:focus{border-color:#ffffff44}
-  button{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;border-radius:12px;padding:10px 12px;font-weight:800;cursor:pointer;box-shadow:0 10px 25px #06b6d444;transition:transform .08s ease, filter .1s}
-  button:hover{filter:brightness(1.05)}
-  button:active{transform:translateY(1px)}
-
-  /* ===== Results ===== */
-  .cards{max-width:1000px;margin:14px auto 20px;display:grid;gap:12px;padding:0 16px}
-  @media(min-width:820px){.cards{grid-template-columns:repeat(3,1fr)}}
-  .card{background:var(--card);border:1px solid #ffffff10;border-radius:16px;padding:14px;box-shadow:0 8px 24px #0007}
-  .card h3{margin:0 0 6px}
-  .range{font-size:20px;font-weight:900}
-  .ok{color:var(--good)}
-  .avoid{color:var(--bad)}
-  .hint{color:var(--muted);font-size:12px;margin-top:4px}
-
-  /* ===== Ticker ===== */
-  .ticker-wrap{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(90deg,#0b1020,#1a1030);border-top:1px solid #ffffff22;padding:6px 0;box-shadow:0 -10px 28px #0007}
-  .ticker{overflow:hidden;white-space:nowrap}
-  .ticker-line{display:inline-block;padding-left:100%;animation:ticker 18s linear infinite;font-weight:800;letter-spacing:.3px}
-  .tag{display:inline-block;margin:0 10px;padding:.2rem .5rem;border-radius:999px;background:var(--gold);color:#1b1b2b}
-  @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
-
-  footer{max-width:1000px;margin:24px auto 70px;color:var(--muted);font-size:12px;padding:0 16px}
+  body { margin: 0; font-family: Arial, sans-serif; background: #0b0f19; color: #fff; text-align: center; }
+  .banner { background: linear-gradient(90deg,#86198f,#7c3aed,#06b6d4); padding: 20px; font-size: 2.5rem; font-weight: bold; }
+  .elder { font-size: 1.2rem; margin-top: 5px; }
+  .bar { margin: 20px auto; max-width: 600px; }
+  input, button { padding: 10px; margin: 5px; border-radius: 8px; border: none; }
+  .cards { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 20px; }
+  .card { background: #12172a; padding: 15px; border-radius: 12px; width: 200px; }
+  .ok { color: #22c55e; font-weight: bold; }
+  .avoid { color: #ef4444; font-weight: bold; }
+  .ticker-wrap { background: #1a1030; padding: 10px; position: fixed; bottom: 0; left: 0; right: 0; }
+  .ticker-line { animation: ticker 18s linear infinite; white-space: nowrap; display: inline-block; }
+  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 </style>
 </head>
 <body>
-  <!-- Big banner is the star -->
-  <section class="banner">
-    <div class="crest">⚔️</div>
-    <div class="title">EDMONTONATION <span class="sub">Clan</span></div>
-    <div class="elder" id="elderChip">Elder Bar: 2500 medals (this week)</div>
-  </section>
-
-  <!-- Compact advisor bar under the banner -->
+  <div class="banner">EDMONTONATION<div class="elder">Elder Bar: 2500 medals</div></div>
   <div class="bar">
-    <div class="bar-inner">
-      <div>
-        <h2>Clan War Time Advisor</h2>
-        <small>Pick your city or timezone. We’ll show evening & morning best times — and what to avoid.</small>
-      </div>
-      <div class="grow">
-        <input id="where" list="cities" placeholder="e.g., Edmonton or America/Edmonton" />
-        <datalist id="cities"></datalist>
-      </div>
-      <button id="useDevice" type="button" title="Use my device timezone">Use my timezone</button>
-      <button id="go" type="button">Get times</button>
-    </div>
+    <input id="where" placeholder="Enter city or timezone" />
+    <button id="useDevice">Use my timezone</button>
+    <button id="go">Get times</button>
   </div>
-
-  <!-- Results -->
   <div class="cards">
-    <div class="card">
-      <h3>Evening — Best Window</h3>
-      <div class="range ok" id="eveningBest">–</div>
-      <div class="hint">After Europe & Middle East peak settles down.</div>
-    </div>
-    <div class="card">
-      <h3>Morning — Best Window</h3>
-      <div class="range ok" id="morningBest">–</div>
-      <div class="hint">Before Europe & Middle East ramp up.</div>
-    </div>
-    <div class="card">
-      <h3>Times to Avoid</h3>
-      <div class="range avoid" id="avoidWin">–</div>
-      <div class="hint">Heavy overlap with EU/ME evenings.</div>
-    </div>
+    <div class="card"><div>Evening — Best</div><div class="ok" id="eveningBest">–</div></div>
+    <div class="card"><div>Morning — Best</div><div class="ok" id="morningBest">–</div></div>
+    <div class="card"><div>Avoid</div><div class="avoid" id="avoidWin">–</div></div>
   </div>
-
-  <footer>
-    This material is unofficial and is not endorsed by Supercell. For more information see Supercell’s Fan Content Policy.
-  </footer>
-
-  <!-- Ticker -->
-  <div class="ticker-wrap" aria-live="polite">
-    <div class="ticker"><span class="ticker-line" id="tickerLine"></span></div>
-  </div>
-
+  <div class="ticker-wrap"><span class="ticker-line" id="tickerLine"></span></div>
 <script>
-// =============== City → Timezone (short helpful list) ===============
-const CITY_TZ = Object.fromEntries([
-  ["edmonton","America/Edmonton"],["calgary","America/Edmonton"],["vancouver","America/Los_Angeles"],
-  ["toronto","America/Toronto"],["new york","America/New_York"],["london","Europe/London"],
-  ["berlin","Europe/Berlin"],["riyadh","Asia/Riyadh"],["mumbai","Asia/Kolkata"],
-  ["singapore","Asia/Singapore"],["tokyo","Asia/Tokyo"],["sydney","Australia/Sydney"]
-]);
-(function fillCities(){
-  const dl = document.getElementById('cities');
-  function titleCase(s){return s.split(' ').map(w=>w? w[0].toUpperCase()+w.slice(1):'').join(' ')}
-  Object.keys(CITY_TZ).sort().forEach(n=>{const o=document.createElement('option');o.value=titleCase(n);dl.appendChild(o)});
-})();
-
-// =============== Helper functions ===============
-function utcHourToLocalRange(tz, startUTC, endUTC){
-  // Return two Date objects in local tz for start and end (same nominal day)
-  const base = new Date();
-  const s = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), startUTC, 0, 0));
-  const e = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), endUTC, 0, 0));
-  const sLocal = new Date(s.toLocaleString('en-US', { timeZone: tz }));
-  const eLocal = new Date(e.toLocaleString('en-US', { timeZone: tz }));
-  return [sLocal, eLocal];
-}
+const CITY_TZ = { "edmonton":"America/Edmonton","calgary":"America/Edmonton","vancouver":"America/Los_Angeles","toronto":"America/Toronto","london":"Europe/London","berlin":"Europe/Berlin","riyadh":"Asia/Riyadh" };
+function utcHourToLocalRange(tz, startUTC, endUTC){ const base = new Date(); const s = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), startUTC)); const e = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), endUTC)); const sLocal = new Date(s.toLocaleString('en-US', { timeZone: tz })); const eLocal = new Date(e.toLocaleString('en-US', { timeZone: tz })); return [sLocal, eLocal]; }
 function fmt(t){ return t.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
-function resolveTZ(input){
-  const s=(input||'').trim(); if(!s) return null; const key=s.toLowerCase();
-  if(CITY_TZ[key]) return CITY_TZ[key];
-  const guess = key.split(',')[0].trim(); if(CITY_TZ[guess]) return CITY_TZ[guess];
-  return s; // assume user gave a valid IANA name
-}
-
-// =============== Core logic (simple & stable) ===============
-// Europe & Middle East aggregate evening peak ~ 16:00–21:00 UTC.
-const PEAK_START_UTC = 16; // 4 PM UTC
-const PEAK_END_UTC   = 21; // 9 PM UTC
-
-function compute(tz){
-  const [peakStartLocal, peakEndLocal] = utcHourToLocalRange(tz, PEAK_START_UTC, PEAK_END_UTC);
-
-  // Avoid = the local mapping of that peak window
-  const avoidStart = peakStartLocal;
-  const avoidEnd   = peakEndLocal;
-
-  // Evening best = 1–3 hours after peak ends (2h window)
-  const eveStart = new Date(peakEndLocal); eveStart.setHours(eveStart.getHours()+1);
-  const eveEnd   = new Date(eveStart);    eveEnd.setHours(eveStart.getHours()+2);
-
-  // Morning best = 4–2 hours before peak starts (2h window)
-  const mornStart = new Date(peakStartLocal); mornStart.setHours(mornStart.getHours()-4);
-  const mornEnd   = new Date(mornStart);      mornEnd.setHours(mornStart.getHours()+2);
-
-  return {
-    eveningBest: `${fmt(eveStart)} – ${fmt(eveEnd)}`,
-    morningBest: `${fmt(mornStart)} – ${fmt(mornEnd)}`,
-    avoid: `${fmt(avoidStart)} – ${fmt(avoidEnd)}`
-  };
-}
-
-function show(times){
-  document.getElementById('eveningBest').textContent = times.eveningBest;
-  document.getElementById('morningBest').textContent = times.morningBest;
-  document.getElementById('avoidWin').textContent    = times.avoid;
-}
-
-// Buttons
-const inputEl = document.getElementById('where');
-
-document.getElementById('useDevice').addEventListener('click', ()=>{
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-  inputEl.value = tz; // fills with IANA name like America/Edmonton
-});
-
-document.getElementById('go').addEventListener('click', ()=>{
-  const raw = inputEl.value.trim();
-  const tz = resolveTZ(raw) || (Intl.DateTimeFormat().resolvedOptions().timeZone);
-  if(!tz){ alert('Enter a city or a timezone like America/Edmonton'); return; }
-  try{ const t = compute(tz); show(t);}catch{ alert('Timezone not recognized. Try an IANA name like America/Edmonton.'); }
-});
-
-// Initial: default to device timezone so it "just works"
-(function init(){
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Edmonton';
-  inputEl.value = tz;
-  show(compute(tz));
-})();
-
-// =============== Elder Bar (editable weekly) ===============
-const CLAN_NAME = 'Edmontonation';
-const ELDER_BAR_MEDALS = 2500; // update weekly
-(function(){
-  const chip = document.getElementById('elderChip');
-  chip.textContent = `Elder Bar: ${ELDER_BAR_MEDALS} medals (this week)`;
-})();
-
-// =============== Ticker (cycles through all lines) ===============
-const ADULT_BANTER = [
-  "By doing your war attacks you build confidence — and confidence attracts hot girls.",
-  "Doing your war attacks helps build wealth and can increase your sex drive.",
-  "Skip excuses, do war attacks — future you says thanks.",
-  "Real Elders finish their war attacks before breakfast.",
-  "War medals today, bragging rights tonight.",
-];
-let idx = 0;
-function rotateTicker(){
-  const line = document.getElementById('tickerLine');
-  const msg = ADULT_BANTER[idx % ADULT_BANTER.length];
-  line.innerHTML = `<span class="tag">NEWS</span> ${msg}`;
-  idx++;
-}
-rotateTicker();
-setInterval(rotateTicker, 9000); // show a new line every 9s
+function resolveTZ(input){ const key = input.trim().toLowerCase(); if(CITY_TZ[key]) return CITY_TZ[key]; return input; }
+const PEAK_START_UTC = 16, PEAK_END_UTC = 21;
+function compute(tz){ const [ps, pe] = utcHourToLocalRange(tz, PEAK_START_UTC, PEAK_END_UTC); const eveS = new Date(pe); eveS.setHours(eveS.getHours()+1); const eveE = new Date(eveS); eveE.setHours(eveE.getHours()+2); const mornS = new Date(ps); mornS.setHours(mornS.getHours()-4); const mornE = new Date(mornS); mornE.setHours(mornE.getHours()+2); return { eveningBest: `${fmt(eveS)} – ${fmt(eveE)}`, morningBest: `${fmt(mornS)} – ${fmt(mornE)}`, avoid: `${fmt(ps)} – ${fmt(pe)}` }; }
+function show(t){ document.getElementById('eveningBest').textContent=t.eveningBest; document.getElementById('morningBest').textContent=t.morningBest; document.getElementById('avoidWin').textContent=t.avoid; }
+document.getElementById('useDevice').onclick=()=>{ document.getElementById('where').value = Intl.DateTimeFormat().resolvedOptions().timeZone; };
+document.getElementById('go').onclick=()=>{ const tz = resolveTZ(document.getElementById('where').value || Intl.DateTimeFormat().resolvedOptions().timeZone); try{ show(compute(tz)); }catch{ alert('Invalid timezone'); } };
+(function init(){ const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Edmonton'; document.getElementById('where').value=tz; show(compute(tz)); })();
+const ADULT_BANTER = ["By doing your war attacks you build confidence — and confidence attracts hot girls.","Doing your war attacks helps build wealth and can increase your sex drive.","Real Elders finish their war attacks before breakfast.","War medals today, bragging rights tonight."];
+let idx = 0; function rotateTicker(){ document.getElementById('tickerLine').textContent = ADULT_BANTER[idx++ % ADULT_BANTER.length]; }
+rotateTicker(); setInterval(rotateTicker, 9000);
 </script>
 </body>
 </html>
